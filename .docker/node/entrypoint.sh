@@ -6,4 +6,7 @@ echo "Container started"
 
 npm cache clean --force
 npm dedupe
+
+npm install
+
 npm run start:debug

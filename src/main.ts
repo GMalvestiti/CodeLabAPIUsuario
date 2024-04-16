@@ -12,17 +12,17 @@ async function bootstrap() {
 
   setupOpenAPI(app);
 
-  await app.listen(3000); // TODO: Change port
+  await app.listen(3001);
 }
 bootstrap();
 
 function setupOpenAPI(app: INestApplication): void {
-  const config = new DocumentBuilder().setTitle('APITemplate').build(); // TODO: Change title
+  const config = new DocumentBuilder().setTitle('CodeLabAPIUsuario').build();
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('docs', app, document, { useGlobalPrefix: true });
 
   Logger.log(
-    'OpenAPI documentation available at http://localhost:3000/api/v1/docs',
-  ); // TODO: Change port
+    'OpenAPI documentation available at http://localhost:3001/api/v1/docs',
+  );
 }
