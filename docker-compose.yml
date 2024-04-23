@@ -1,5 +1,7 @@
 services:
   api-usuario:
+    depends_on:
+      - db-usuario
     container_name: api-usuario
     build:
       context: .docker/node/
