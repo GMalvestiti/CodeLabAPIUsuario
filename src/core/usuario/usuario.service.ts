@@ -8,7 +8,7 @@ import { Usuario } from './entities/usuario.entity';
 @Injectable()
 export class UsuarioService {
   @InjectRepository(Usuario)
-  private readonly repository: Repository<Usuario>;
+  private repository: Repository<Usuario>;
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
     const finded = await this.repository.findOne({

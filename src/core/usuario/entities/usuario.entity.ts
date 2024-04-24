@@ -28,7 +28,7 @@ export class Usuario {
   @Column({ nullable: false })
   admin: boolean;
 
-  @OneToMany(() => UsuarioPermissao, (permissao) => permissao.idUsuario, {
+  @OneToMany(() => UsuarioPermissao, (permissao) => permissao.usuario, {
     eager: true,
   })
   permissao: UsuarioPermissao[];
