@@ -6,6 +6,6 @@ echo "Container started"
 
 # npm dedupe
 
-npm install
+npm install --legacy-peer-deps
 
 npm run start:debug
