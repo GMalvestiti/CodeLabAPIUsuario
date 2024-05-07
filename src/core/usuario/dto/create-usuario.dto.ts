@@ -1,10 +1,8 @@
-import { IsEmail, IsEmpty, IsNotEmpty, MaxLength } from 'class-validator';
-import { EMensagem } from 'src/shared/enums/mensagem.enum';
+import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
+import { EMensagem } from '../../../shared/enums/mensagem.enum';
 
 export class CreateUsuarioDto {
-  @IsEmpty({ message: `id ${EMensagem.DEVE_SER_VAZIO}` }) // Nunca deve ser preenchido
-  id: number;
-
+  // Sem id devido ao whitelist do ValidationPipe
   @IsNotEmpty({ message: `nome ${EMensagem.NAO_PODE_SER_VAZIO}` })
   @MaxLength(60, { message: `nome ${EMensagem.MAIS_CARACTERES_QUE_PERMITIDO}` })
   nome: string;
