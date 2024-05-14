@@ -5,3 +5,5 @@ app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 Interceptor: recebe e transforma retorno
 Filter: Recebe retorno
 Middleware: Recebe requisição (entrada e retorno)
+
+getRepositoryToken (testes unitários)

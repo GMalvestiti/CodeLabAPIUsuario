@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
-    "@nestjs/cli": "^10.0.0",
+    "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^4.17.17",
@@ -78,8 +78,12 @@
     "coverageDirectory": "../coverage/unit",
     "testEnvironment": "node",
     "coveragePathIgnorePatterns": [
-      "main.ts",
-      ".module.ts"
+      "main.ts$",
+      ".ormconfig-seed.ts$",
+      ".module.ts$",
+      ".spec.ts$",
+      ".seed.ts$",
+      ".factory.ts$"
     ]
   }
 }
