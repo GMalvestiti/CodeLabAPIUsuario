@@ -33,8 +33,8 @@ export class UsuarioService {
 
     return await this.repository.find({
       loadEagerRelations: false,
-      skip: page * size || 0,
-      take: size || 10,
+      skip: page * size,
+      take: size,
     });
   }
 
