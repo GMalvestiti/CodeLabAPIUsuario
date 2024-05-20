@@ -2,7 +2,7 @@ import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { ResponseExceptionFilter } from './shared/filters/reponse-exception.filter';
+import { ResponseExceptionsFilter } from './shared/filters/response-exception.filter';
 import { ResponseTransformInterceptor } from './shared/interceptors/response-transform.interceptor';
 
 async function bootstrap() {
@@ -11,7 +11,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.useGlobalInterceptors(new ResponseTransformInterceptor());
-  app.useGlobalFilters(new ResponseExceptionFilter());
+  app.useGlobalFilters(new ResponseExceptionsFilter());
   app.enableCors();
 
   setupOpenAPI(app);
@@ -21,12 +21,10 @@ async function bootstrap() {
 bootstrap();
 
 function setupOpenAPI(app: INestApplication): void {
-  const config = new DocumentBuilder().setTitle('CodeLabAPIUsuario').build();
+  const config = new DocumentBuilder().setTitle('CodelabAPIUsuario').build();
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('docs', app, document, { useGlobalPrefix: true });
 
-  Logger.log(
-    'OpenAPI documentation available at http://localhost:3001/api/v1/docs',
-  );
+  Logger.log('OpenAPI is running on http://localhost:3001/api/v1/docs');
 }

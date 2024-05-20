@@ -1,5 +1,6 @@
 import {
   ArgumentsHost,
+  Catch,
   ExceptionFilter,
   HttpException,
   HttpStatus,
@@ -7,10 +8,11 @@ import {
 import { Response } from 'express';
 import { IResponseException } from '../interfaces/response-exception.interface';
 
-export class ResponseExceptionFilter<T> implements ExceptionFilter {
+@Catch()
+export class ResponseExceptionsFilter<T> implements ExceptionFilter {
   catch(exception: T, host: ArgumentsHost) {
-    const context = host.switchToHttp();
-    const response = context.getResponse<Response>();
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
 
     const status =
       exception instanceof HttpException
@@ -18,12 +20,14 @@ export class ResponseExceptionFilter<T> implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     return response.status(status).json({
-      message: this.transformResponseException(exception as IResponseException),
+      message: this.transformResponse(
+        exception as unknown as IResponseException,
+      ),
       data: null,
     });
   }
 
-  private transformResponseException(exception: IResponseException): string {
+  transformResponse(exception: IResponseException): string {
     if (exception.response?.message) {
       return exception.response.message;
     }

@@ -33,18 +33,19 @@ export class UsuarioService {
 
     return await this.repository.find({
       loadEagerRelations: false,
-      skip: page * size,
+      skip: size * page,
       take: size,
     });
   }
 
   async findOne(id: number): Promise<Usuario> {
-    return await this.repository.findOne({
-      where: { id: id },
-    });
+    return await this.repository.findOne({ where: { id: id } });
   }
 
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
+  async update(
+    id: number,
+    updateUsuarioDto: UpdateUsuarioDto,
+  ): Promise<Usuario> {
     if (id !== updateUsuarioDto.id) {
       throw new HttpException(
         EMensagem.IDS_DIFERENTES,
@@ -68,9 +69,7 @@ export class UsuarioService {
   }
 
   async unactivate(id: number): Promise<boolean> {
-    const finded = await this.repository.findOne({
-      where: { id: id },
-    });
+    const finded = await this.repository.findOne({ where: { id: id } });
 
     if (!finded) {
       throw new HttpException(

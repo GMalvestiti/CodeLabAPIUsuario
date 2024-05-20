@@ -20,7 +20,7 @@ export class HttpResponse<T> implements IResponse<T> {
     return this;
   }
 
-  onUnactivate(): IResponse<T> {
+  onUnactivated(): IResponse<T> {
     this.message = EMensagem.DESATIVADO_SUCESSO;
     return this;
   }

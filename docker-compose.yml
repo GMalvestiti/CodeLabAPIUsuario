@@ -9,12 +9,7 @@ services:
       - '3001:3001'
       - '7001:7001'
     volumes:
-      - ./:/home/node/app
-    deploy:
-      resources:
-        reservations:
-          cpus: '1'
-          memory: 4G
+      - .:/home/node/app
 
   db-usuario:
     container_name: db-usuario
@@ -30,8 +25,3 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - '5001:5001'
-    deploy:
-      resources:
-        reservations:
-          cpus: '1'
-          memory: 4G

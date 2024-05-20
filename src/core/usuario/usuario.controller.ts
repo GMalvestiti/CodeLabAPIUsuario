@@ -33,8 +33,8 @@ export class UsuarioController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.usuarioService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.usuarioService.findOne(+id);
   }
 
   @Patch(':id')
@@ -48,9 +48,9 @@ export class UsuarioController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<IResponse<boolean>> {
+  async unactivate(@Param('id') id: number): Promise<IResponse<boolean>> {
     const data = await this.usuarioService.unactivate(id);
 
-    return new HttpResponse<boolean>(data).onUnactivate();
+    return new HttpResponse<boolean>(data).onUnactivated();
   }
 }

@@ -7,7 +7,7 @@ export class CreateUsuarioDto {
   @MaxLength(60, { message: `nome ${EMensagem.MAIS_CARACTERES_QUE_PERMITIDO}` })
   nome: string;
 
-  @IsNotEmpty({ message: `nome ${EMensagem.NAO_PODE_SER_VAZIO}` })
+  @IsNotEmpty({ message: `email ${EMensagem.NAO_PODE_SER_VAZIO}` })
   @IsEmail({}, { message: `email ${EMensagem.NAO_VALIDO}` })
   email: string;
 

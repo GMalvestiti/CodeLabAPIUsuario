@@ -11,7 +11,7 @@ services:
       - '3001:3001'
       - '7001:7001'
     volumes:
-      - ./:/home/node/app
+      - .:/home/node/app
     depends_on:
       db-usuario-test:
         condition: service_healthy
