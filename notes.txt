@@ -7,3 +7,8 @@ Filter: Recebe retorno
 Middleware: Recebe requisição (entrada e retorno)
 
 getRepositoryToken (testes unitários)
+usuario.controller.spec.ts
+
+testes unitários filters
+
+parse-find-all-order.pipe.ts

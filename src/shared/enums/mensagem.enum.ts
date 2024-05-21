@@ -3,6 +3,7 @@ export enum EMensagem {
   DESATIVADO_SUCESSO = 'Desativado com sucesso.',
   DEVE_SER_VAZIO = 'deve ser vazio.',
   DEVE_SER_INFORMADO = 'deve ser informado.',
+  FILTER_INVALIDO = 'Filter inválido.',
   IDS_DIFERENTES = 'Os IDs informados são diferentes.',
   IMPOSSIVEL_ALTERAR = 'Impossível alterar o cadastro.',
   IMPOSSIVEL_CADASTRAR = 'Impossível realizar o cadastro.',
@@ -10,5 +11,6 @@ export enum EMensagem {
   NAO_PODE_SER_VAZIO = 'não pode ser vazio.',
   NAO_VALIDO = 'não é válido.',
   MAIS_CARACTERES_QUE_PERMITIDO = 'possui mais caracteres que o permitido.',
+  ORDER_INVALIDO = 'Order inválido.',
   SALVO_SUCESSO = 'Salvo com sucesso.',
 }
