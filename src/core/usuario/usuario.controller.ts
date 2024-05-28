@@ -12,8 +12,9 @@ import { HttpResponse } from '../../shared/classes/http-response';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
 import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
 import { IResponse } from '../../shared/interfaces/response.interface';
+import { ParseFindAllFilterPipe } from '../../shared/pipes/parse-find-all-filter.pipe';
 import { ParseFindAllOrderPipe } from '../../shared/pipes/parse-find-all-order.pipe';
-import { ParseFindAllFilterPipe } from '../../shared/pipes/parse-find-all.pipe';
+
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
@@ -54,6 +55,16 @@ export class UsuarioController {
 
   @Patch(':id')
   async update(
+    @Param('id') id: number,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
+  ): Promise<IResponse<Usuario>> {
+    const data = await this.usuarioService.update(id, updateUsuarioDto);
+
+    return new HttpResponse<Usuario>(data).onUpdate();
+  }
+
+  @Patch(':email/:token')
+  async alterarSenha(
     @Param('id') id: number,
     @Body() updateUsuarioDto: UpdateUsuarioDto,
   ): Promise<IResponse<Usuario>> {

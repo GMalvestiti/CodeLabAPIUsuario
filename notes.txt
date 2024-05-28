@@ -12,3 +12,9 @@ usuario.controller.spec.ts
 testes unitários filters
 
 parse-find-all-order.pipe.ts
+
+casting "as"
+
+nodemailer
+    https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
+    https://www.nodemailer.com/usage/using-gmail/

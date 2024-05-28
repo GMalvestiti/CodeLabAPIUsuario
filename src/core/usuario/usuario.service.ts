@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { EMensagem } from '../../shared/enums/mensagem.enum';
 import { handleFilter } from '../../shared/helpers/sql.helper';
@@ -25,6 +26,8 @@ export class UsuarioService {
         HttpStatus.NOT_ACCEPTABLE,
       );
     }
+
+    createUsuarioDto.senha = bcrypt.hashSync(createUsuarioDto.senha);
 
     const created = this.repository.create(createUsuarioDto);
 
@@ -77,8 +80,16 @@ export class UsuarioService {
       );
     }
 
+    updateUsuarioDto.senha = bcrypt.hashSync(updateUsuarioDto.senha);
+
     return await this.repository.save(updateUsuarioDto);
   }
+
+  async alterarSenha(
+    email: string,
+    token: string,
+    senha: string,
+  ): Promise<boolean> {}
 
   async unactivate(id: number): Promise<boolean> {
     const finded = await this.repository.findOne({ where: { id: id } });
