@@ -10,6 +10,11 @@ export class HttpResponse<T> implements IResponse<T> {
     this.data = data;
   }
 
+  onSuccess(message: string): IResponse<T> {
+    this.message = message;
+    return this;
+  }
+
   onCreated(): IResponse<T> {
     this.message = EMensagem.SALVO_SUCESSO;
     return this;
