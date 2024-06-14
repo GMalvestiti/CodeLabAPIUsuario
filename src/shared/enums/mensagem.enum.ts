@@ -6,7 +6,7 @@ export enum EMensagem {
   DEVE_SER_INFORMADO = 'deve ser informado.',
   FILTER_INVALIDO = 'Filter inválido.',
   IDS_DIFERENTES = 'Os IDs informados são diferentes.',
-  IMPOSSIVEL_ALTERAR = 'Impossível alterar o cadastro.',
+  IMPOSSIVEL_ALTERAR = 'Impossível alterar.',
   IMPOSSIVEL_CADASTRAR = 'Impossível realizar o cadastro.',
   IMPOSSIVEL_DESATIVAR = 'Impossível desativar o cadastro.',
   NAO_PODE_SER_VAZIO = 'não pode ser vazio.',
@@ -15,5 +15,7 @@ export enum EMensagem {
   ORDER_INVALIDO = 'Order inválido.',
   VERIFIQUE_ENDERECO_EMAIL_INFORMADO = 'Verifique o endereço de e-mail informado.',
   SALVO_SUCESSO = 'Salvo com sucesso.',
+  TIPO_INVALIDO = 'Tipo inválido.',
+  TOKEN_INVALIDO = 'Token inválido.',
   USUARIO_SENHA_INVALIDOS = 'Usuário e/ou senha inválidos.',
 }

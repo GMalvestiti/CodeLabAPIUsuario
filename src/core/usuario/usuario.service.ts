@@ -6,14 +6,23 @@ import { EMensagem } from '../../shared/enums/mensagem.enum';
 import { handleFilter } from '../../shared/helpers/sql.helper';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
 import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
+import { RecuperacaoSenha } from '../recuperacao-senha/entities/recuperacao-senha.entity';
+import { AlterarSenhaUsuarioDto } from './dto/alterar-senha-usuario.dto';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { UsuarioPermissao } from './entities/usuario-permissao.entity';
 import { Usuario } from './entities/usuario.entity';
 
 @Injectable()
 export class UsuarioService {
   @InjectRepository(Usuario)
   private repository: Repository<Usuario>;
+
+  @InjectRepository(UsuarioPermissao)
+  private repositoryUsuarioPermissao: Repository<UsuarioPermissao>;
+
+  @InjectRepository(RecuperacaoSenha)
+  private repositoryRecuperacaoSenha: Repository<RecuperacaoSenha>;
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
     const finded = await this.repository.findOne({
@@ -27,9 +36,11 @@ export class UsuarioService {
       );
     }
 
-    createUsuarioDto.senha = bcrypt.hashSync(createUsuarioDto.senha);
+    const usuario = new Usuario(createUsuarioDto);
 
-    const created = this.repository.create(createUsuarioDto);
+    usuario.senha = bcrypt.hashSync(createUsuarioDto.senha);
+
+    const created = this.repository.create(usuario);
 
     return await this.repository.save(created);
   }
@@ -80,16 +91,61 @@ export class UsuarioService {
       );
     }
 
-    updateUsuarioDto.senha = bcrypt.hashSync(updateUsuarioDto.senha);
+    await this.repositoryUsuarioPermissao.delete({ idUsuario: id });
 
-    return await this.repository.save(updateUsuarioDto);
+    for (const permissao in updateUsuarioDto.permissao) {
+      Object.assign(updateUsuarioDto.permissao[permissao], { idUsuario: id });
+    }
+
+    if (updateUsuarioDto.senha) {
+      updateUsuarioDto.senha = bcrypt.hashSync(updateUsuarioDto.senha);
+    }
+
+    return await this.repository.save(updateUsuarioDto as Usuario);
   }
 
   async alterarSenha(
-    email: string,
-    token: string,
-    senha: string,
-  ): Promise<boolean> {}
+    alterarSenhaUsuarioDto: AlterarSenhaUsuarioDto,
+  ): Promise<boolean> {
+    const findedToken = await this.repositoryRecuperacaoSenha.findOne({
+      where: {
+        email: alterarSenhaUsuarioDto.email,
+        id: alterarSenhaUsuarioDto.token,
+      },
+    });
+
+    if (!findedToken) {
+      throw new HttpException(
+        EMensagem.IMPOSSIVEL_ALTERAR,
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    const msInHoras = 60 * 60 * 100;
+
+    const diffInHoras =
+      Math.abs(Number(new Date()) - Number(findedToken.dataCriacao)) /
+      msInHoras;
+
+    if (diffInHoras > 24) {
+      throw new HttpException(
+        EMensagem.TOKEN_INVALIDO,
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    const usuario = await this.repository.findOne({
+      where: { email: alterarSenhaUsuarioDto.email },
+    });
+
+    usuario.senha = bcrypt.hashSync(alterarSenhaUsuarioDto.senha);
+
+    await this.repository.save(usuario);
+
+    await this.repositoryRecuperacaoSenha.delete({ id: findedToken.id });
+
+    return true;
+  }
 
   async unactivate(id: number): Promise<boolean> {
     const finded = await this.repository.findOne({ where: { id: id } });

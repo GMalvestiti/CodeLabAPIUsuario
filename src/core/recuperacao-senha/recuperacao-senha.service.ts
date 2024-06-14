@@ -22,9 +22,13 @@ export class RecuperacaoSenhaService {
     });
 
     if (findedUsuario) {
+      await this.repository.delete({ email: createRecuperacaoSenhaDto.email });
+
       const created = this.repository.create(createRecuperacaoSenhaDto);
 
       this.repository.save(created);
+
+      // TODO: enviar email
     }
   }
 }
