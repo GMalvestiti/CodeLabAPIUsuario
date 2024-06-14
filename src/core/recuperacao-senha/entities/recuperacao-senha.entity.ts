@@ -15,6 +15,6 @@ export class RecuperacaoSenha {
   @Column()
   email: string;
 
-  @CreateDateColumn({ name: 'data_criacao' })
+  @CreateDateColumn()
   dataCriacao: Date;
 }

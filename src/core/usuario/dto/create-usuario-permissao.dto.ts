@@ -4,5 +4,5 @@ import { EMensagem } from '../../../shared/enums/mensagem.enum';
 export class CreateUsuarioPermissaoDto {
   @IsNotEmpty({ message: `modulo ${EMensagem.NAO_PODE_SER_VAZIO}` })
   @IsInt()
-  idModulo: number;
+  modulo: number;
 }

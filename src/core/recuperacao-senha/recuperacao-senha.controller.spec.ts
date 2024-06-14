@@ -11,9 +11,7 @@ describe('RecuperacaoSenhaController', () => {
       providers: [RecuperacaoSenhaService],
     }).compile();
 
-    controller = module.get<RecuperacaoSenhaController>(
-      RecuperacaoSenhaController,
-    );
+    controller = module.get<RecuperacaoSenhaController>(RecuperacaoSenhaController);
   });
 
   it('should be defined', () => {

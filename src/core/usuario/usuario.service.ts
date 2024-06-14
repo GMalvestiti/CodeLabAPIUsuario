@@ -38,7 +38,7 @@ export class UsuarioService {
 
     const usuario = new Usuario(createUsuarioDto);
 
-    usuario.senha = bcrypt.hashSync(createUsuarioDto.senha);
+    usuario.senha = bcrypt.hashSync(usuario.senha);
 
     const created = this.repository.create(usuario);
 
@@ -101,7 +101,7 @@ export class UsuarioService {
       updateUsuarioDto.senha = bcrypt.hashSync(updateUsuarioDto.senha);
     }
 
-    return await this.repository.save(updateUsuarioDto as Usuario);
+    return await this.repository.save(updateUsuarioDto);
   }
 
   async alterarSenha(

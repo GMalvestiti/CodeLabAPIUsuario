@@ -12,15 +12,15 @@ export class UsuarioPermissao {
   @PrimaryGeneratedColumn({ primaryKeyConstraintName: 'pk_usuariopermissao' })
   id: number;
 
-  @Column({ nullable: false, name: 'id_usuario' })
+  @Column({ nullable: false })
   idUsuario: number;
 
-  @Column({ nullable: false, name: 'id_modulo' })
-  idModulo: number;
+  @Column({ nullable: false })
+  modulo: number;
 
   @ManyToOne(() => Usuario, (usuario) => usuario.id)
   @JoinColumn({
-    name: 'id_usuario',
+    name: 'idUsuario',
     foreignKeyConstraintName: 'fk_permissao_usuario',
   })
   usuario: Usuario;
