@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { CreateRecuperacaoSenhaDto } from './dto/create-recuperacao-senha.dto';
 import { RecuperacaoSenha } from './entities/recuperacao-senha.entity';
+import { ClientProxy } from '@nestjs/microservices';
+import { EnviarEmailDto } from 'src/shared/dtos/enviar-email.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RecuperacaoSenhaService {
@@ -13,11 +16,19 @@ export class RecuperacaoSenhaService {
   @InjectRepository(Usuario)
   private usuarioRepository: Repository<Usuario>;
 
+  @Inject()
+  private readonly configService: ConfigService;
+
+  constructor(
+    @Inject('MAIL_SERVICE')
+    private readonly mailService: ClientProxy,
+  ) {}
+
   async create(
     createRecuperacaoSenhaDto: CreateRecuperacaoSenhaDto,
   ): Promise<void> {
     const findedUsuario = await this.usuarioRepository.findOne({
-      select: ['id'],
+      select: ['id', 'nome'],
       where: { email: createRecuperacaoSenhaDto.email },
     });
 
@@ -26,9 +37,21 @@ export class RecuperacaoSenhaService {
 
       const created = this.repository.create(createRecuperacaoSenhaDto);
 
-      this.repository.save(created);
+      const saved = await this.repository.save(created);
 
-      // TODO: enviar email
+      const baseUrl = this.configService.get<string>('BASE_URL_FRONT');
+
+      const data: EnviarEmailDto = {
+        subject: 'Recuperação de Senha',
+        to: createRecuperacaoSenhaDto.email,
+        template: 'recuperacao-senha',
+        context: {
+          name: findedUsuario.nome,
+          link: `${baseUrl}/recuperacao-senha?token=${saved.id}&email=${createRecuperacaoSenhaDto.email}`,
+        },
+      };
+
+      this.mailService.emit('enviar-email', data);
     }
   }
 }

@@ -21,3 +21,8 @@ nodemailer
 
 gRPC >>> APIUsuario e ApiEmail - Comunicação síncrona/dados grandes
 rabbitmq >>> APIUsuario e ApiEmail - Comunicação assíncrona
+
+rqm-client.service
+recuperacao-senha.module > RmqClientService provider
+imports x providers
+injection class x token
