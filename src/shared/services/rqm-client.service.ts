@@ -5,11 +5,11 @@ import {
   ClientProxyFactory,
   Closeable,
 } from '@nestjs/microservices';
-import { rmqConfig } from 'src/config/queue/rmq.config';
+import { rmqConfig } from '../../config/queue/rmq.config';
 
 @Injectable()
-export class RqmClientService {
-  constructor(private configService: ConfigService) {}
+export class RmqClientService {
+  constructor(private configService: ConfigService) { }
 
   async createRabbitMQOptions(queue: string): Promise<ClientProxy & Closeable> {
     return Promise.resolve(

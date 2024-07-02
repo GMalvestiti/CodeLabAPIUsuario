@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EnviarEmailDto } from '../../shared/dtos/enviar-email.dto';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { CreateRecuperacaoSenhaDto } from './dto/create-recuperacao-senha.dto';
 import { RecuperacaoSenha } from './entities/recuperacao-senha.entity';
-import { ClientProxy } from '@nestjs/microservices';
-import { EnviarEmailDto } from 'src/shared/dtos/enviar-email.dto';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RecuperacaoSenhaService {
@@ -22,7 +22,7 @@ export class RecuperacaoSenhaService {
   constructor(
     @Inject('MAIL_SERVICE')
     private readonly mailService: ClientProxy,
-  ) {}
+  ) { }
 
   async create(
     createRecuperacaoSenhaDto: CreateRecuperacaoSenhaDto,
@@ -47,7 +47,7 @@ export class RecuperacaoSenhaService {
         template: 'recuperacao-senha',
         context: {
           name: findedUsuario.nome,
-          link: `${baseUrl}/recuperacao-senha?token=${saved.id}&email=${createRecuperacaoSenhaDto.email}`,
+          link: `${baseUrl}recuperacao-senha?token=${saved.id}&email=${createRecuperacaoSenhaDto.email}`,
         },
       };
 
