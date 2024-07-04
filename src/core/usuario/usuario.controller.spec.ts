@@ -116,6 +116,7 @@ describe('UsuarioController', () => {
         senha: '12345678',
         ativo: true,
         admin: false,
+        permissao: [],
       };
 
       const mockUsuario = Object.assign(updateUsuarioDto);

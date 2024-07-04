@@ -18,5 +18,9 @@ describe('AppController', () => {
     it('should return "Hello World!"', () => {
       expect(appController.getHello()).toBe('Hello CodeLab!');
     });
+
+    it('should return <> "Hello World!"', () => {
+      expect(appController.getHello()).not.toBe('ABC');
+    });
   });
 });

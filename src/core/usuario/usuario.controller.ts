@@ -9,6 +9,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { HttpResponse } from '../../shared/classes/http-response';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
 import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
@@ -24,7 +25,7 @@ import { UsuarioService } from './usuario.service';
 
 @Controller('usuario')
 export class UsuarioController {
-  constructor(private readonly usuarioService: UsuarioService) {}
+  constructor(private readonly usuarioService: UsuarioService) { }
 
   @Post()
   async create(
@@ -79,5 +80,10 @@ export class UsuarioController {
     const data = await this.usuarioService.unactivate(id);
 
     return new HttpResponse<boolean>(data).onUnactivated();
+  }
+
+  @GrpcMethod('UsuarioService', 'FindOne')
+  async findOneGrpc(data: { id: string }): Promise<Usuario> {
+    return this.usuarioService.findOneGrpc(+data.id);
   }
 }
