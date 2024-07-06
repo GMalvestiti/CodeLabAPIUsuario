@@ -9,7 +9,7 @@ import { rmqConfig } from '../../config/queue/rmq.config';
 
 @Injectable()
 export class RmqClientService {
-  constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {}
 
   async createRabbitMQOptions(queue: string): Promise<ClientProxy & Closeable> {
     return Promise.resolve(

@@ -6,6 +6,7 @@ import { EMensagem } from '../../shared/enums/mensagem.enum';
 import { handleFilter } from '../../shared/helpers/sql.helper';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
 import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
+import { IResponse } from '../../shared/interfaces/response.interface';
 import { RecuperacaoSenha } from '../recuperacao-senha/entities/recuperacao-senha.entity';
 import { AlterarSenhaUsuarioDto } from './dto/alterar-senha-usuario.dto';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -50,18 +51,18 @@ export class UsuarioService {
     size: number,
     order: IFindAllOrder,
     filter?: IFindAllFilter | IFindAllFilter[],
-  ): Promise<Usuario[]> {
-    page--;
-
+  ): Promise<IResponse<Usuario[]>> {
     const where = handleFilter(filter);
 
-    return await this.repository.find({
+    const [data, count] = await this.repository.findAndCount({
       loadEagerRelations: false,
       order: { [order.column]: order.sort },
       where,
       skip: size * page,
       take: size,
     });
+
+    return { data, count, message: null };
   }
 
   async findOne(id: number): Promise<Usuario> {

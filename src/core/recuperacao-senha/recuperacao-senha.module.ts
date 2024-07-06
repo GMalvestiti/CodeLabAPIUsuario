@@ -27,4 +27,4 @@ import { RecuperacaoSenhaService } from './recuperacao-senha.service';
     RmqClientService,
   ],
 })
-export class RecuperacaoSenhaModule { }
+export class RecuperacaoSenhaModule {}

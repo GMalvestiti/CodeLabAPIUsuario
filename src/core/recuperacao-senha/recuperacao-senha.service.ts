@@ -22,7 +22,7 @@ export class RecuperacaoSenhaService {
   constructor(
     @Inject('MAIL_SERVICE')
     private readonly mailService: ClientProxy,
-  ) { }
+  ) {}
 
   async create(
     createRecuperacaoSenhaDto: CreateRecuperacaoSenhaDto,

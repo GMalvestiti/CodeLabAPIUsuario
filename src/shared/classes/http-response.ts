@@ -4,10 +4,12 @@ import { IResponse } from '../interfaces/response.interface';
 export class HttpResponse<T> implements IResponse<T> {
   message = '';
   data: T | null | undefined;
+  count!: number;
 
-  constructor(data: T | null | undefined, message?: '') {
+  constructor(data: T | null | undefined, message?: '', count?: number) {
     this.message = message;
     this.data = data;
+    this.count = count;
   }
 
   onSuccess(message: string): IResponse<T> {

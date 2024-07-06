@@ -16,10 +16,10 @@ export class ResponseTransformInterceptor<T>
 
   private transformResponse(returned: T): IResponse<T> {
     const data = returned as IResponse<T>;
-
     const responseFormated = {
       message: data?.message ?? null,
       data: data?.data ?? data,
+      count: data?.count ?? undefined,
     };
 
     return responseFormated as IResponse<T>;
