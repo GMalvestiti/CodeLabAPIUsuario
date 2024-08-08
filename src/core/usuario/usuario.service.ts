@@ -74,9 +74,11 @@ export class UsuarioService {
       select: ['id', 'nome', 'email'],
       where: { id: id },
     });
+
     if (usuario) {
       return usuario;
     }
+    
     return {} as unknown as Usuario;
   }
 

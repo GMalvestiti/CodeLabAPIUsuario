@@ -22,7 +22,7 @@
     "seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-seeding/dist/cli.js seed -n src/ormconfig-seed.ts"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.10.10",
+    "@grpc/grpc-js": "^1.11.1",
     "@grpc/proto-loader": "^0.7.13",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",

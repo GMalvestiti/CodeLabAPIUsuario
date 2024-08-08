@@ -20,6 +20,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>(
     grpcConfig('usuario', 'GRPC_USUARIO', app.get(ConfigService)),
   );
+  
   app.startAllMicroservices();
 
   setupOpenAPI(app);
