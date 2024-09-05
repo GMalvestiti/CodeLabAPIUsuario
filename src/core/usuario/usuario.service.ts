@@ -78,7 +78,7 @@ export class UsuarioService {
     if (usuario) {
       return usuario;
     }
-    
+
     return {} as unknown as Usuario;
   }
 
