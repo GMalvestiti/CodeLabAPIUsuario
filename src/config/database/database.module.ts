@@ -15,8 +15,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         logging: configService.get('DB_LOGGING') === 'true' ? true : ['error'],
         // Apenas bom para ambiente de desenvolvimento
-        synchronize: true,
-        autoLoadEntities: true,
+        // synchronize: true,
+        // autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),
