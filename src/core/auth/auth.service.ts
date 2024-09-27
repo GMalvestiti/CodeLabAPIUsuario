@@ -1,14 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { EMensagem } from '../../shared/enums/mensagem.enum';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { LoginDto } from './dto/login.dto';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { KongService } from './kong.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { KongService } from './kong.service';
 
 @Injectable()
 export class AuthService {
@@ -22,14 +22,22 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto): Promise<string> {
+    console.log('loginDto', loginDto);
     const finded = await this.usuarioRepository.findOne({
       select: ['id', 'senha', 'email', 'nome', 'admin'],
       where: { email: loginDto.email },
     });
 
+    if (!finded) {
+      throw new HttpException(
+        EMensagem.USUARIO_SENHA_INVALIDOS,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
     const matchPassword = bcrypt.compareSync(loginDto.senha, finded.senha);
 
-    if (!finded || !matchPassword) {
+    if (!matchPassword) {
       throw new HttpException(
         EMensagem.USUARIO_SENHA_INVALIDOS,
         HttpStatus.UNAUTHORIZED,
