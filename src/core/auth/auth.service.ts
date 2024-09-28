@@ -22,7 +22,6 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto): Promise<string> {
-    console.log('loginDto', loginDto);
     const finded = await this.usuarioRepository.findOne({
       select: ['id', 'senha', 'email', 'nome', 'admin'],
       where: { email: loginDto.email },
