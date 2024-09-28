@@ -2,7 +2,9 @@ import { ILike } from 'typeorm';
 import { IFindAllFilter } from '../interfaces/find-all-filter.interface';
 
 export const handleFilter = (filter: IFindAllFilter | IFindAllFilter[]) => {
-  if (!filter) return {};
+  if (!filter) {
+    return {};
+  }
 
   const filters = Array.isArray(filter) ? filter : [filter];
 

@@ -66,7 +66,9 @@ export class UsuarioService {
   }
 
   async findOne(id: number): Promise<Usuario> {
-    return await this.repository.findOne({ where: { id: id } });
+    return await this.repository.findOne({
+      where: { id: id },
+    });
   }
 
   async findOneGrpc(id: number): Promise<Usuario> {
@@ -162,7 +164,9 @@ export class UsuarioService {
   }
 
   async unactivate(id: number): Promise<boolean> {
-    const finded = await this.repository.findOne({ where: { id: id } });
+    const finded = await this.repository.findOne({
+      where: { id: id },
+    });
 
     if (!finded) {
       throw new HttpException(
