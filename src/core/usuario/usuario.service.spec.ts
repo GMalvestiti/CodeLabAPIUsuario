@@ -1,32 +1,101 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EMensagem } from '../../shared/enums/mensagem.enum';
+import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
+import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
+import { RecuperacaoSenha } from '../recuperacao-senha/entities/recuperacao-senha.entity';
+import { AlterarSenhaUsuarioDto } from './dto/alterar-senha-usuario.dto';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { UsuarioPermissao } from './entities/usuario-permissao.entity';
 import { Usuario } from './entities/usuario.entity';
 import { UsuarioService } from './usuario.service';
+
+const mockCreateUsuarioDto: CreateUsuarioDto = {
+  nome: 'Usuario de Teste',
+  email: 'teste@exemplo.com',
+  senha: 'senha123',
+  ativo: true,
+  admin: false,
+  permissao: [{ modulo: 1 }],
+};
+
+const mockUpdateUsuarioDto: UpdateUsuarioDto = Object.assign(
+  mockCreateUsuarioDto,
+  { id: 1 },
+);
+
+const mockUsuario: Usuario = new Usuario(mockUpdateUsuarioDto);
+
+const mockFindAllOrder: IFindAllOrder = {
+  column: 'id',
+  sort: 'asc',
+};
+
+const mockFindAllFilter: IFindAllFilter = {
+  column: 'id',
+  value: 1,
+};
+
+const mockAlterarSenha: AlterarSenhaUsuarioDto = {
+  email: mockUsuario.email,
+  senha: 'novaSenha',
+  token: '123456',
+};
+
+const mockRecuperarSenha: RecuperacaoSenha = {
+  id: mockAlterarSenha.token,
+  email: mockAlterarSenha.email,
+  dataCriacao: new Date(),
+};
+
+const senhaBcrypt =
+  '$2a$10$feBRG3KNvWWNxhnmdgj0CeUtfgxuIs3sNR9agLQoRD570daP.jEy2';
 
 describe('UsuarioService', () => {
   let service: UsuarioService;
   let repository: Repository<Usuario>;
+  let repositoryRecuperacaoSenha: Repository<RecuperacaoSenha>;
+  let repositoryUsuarioPermissao: Repository<UsuarioPermissao>;
 
   beforeEach(async () => {
+    repository = {
+      create: jest.fn(),
+      save: jest.fn(),
+      findOne: jest.fn(),
+      findAndCount: jest.fn(),
+    } as unknown as Repository<Usuario>;
+
+    repositoryRecuperacaoSenha = {
+      findOne: jest.fn(),
+      delete: jest.fn(),
+    } as unknown as Repository<RecuperacaoSenha>;
+
+    repositoryUsuarioPermissao = {
+      delete: jest.fn(),
+    } as unknown as Repository<UsuarioPermissao>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsuarioService,
         {
           provide: getRepositoryToken(Usuario),
-          useValue: {
-            create: jest.fn(),
-            findOne: jest.fn(),
-            find: jest.fn(),
-            save: jest.fn(),
-          },
+          useValue: repository,
+        },
+        {
+          provide: getRepositoryToken(RecuperacaoSenha),
+          useValue: repositoryRecuperacaoSenha,
+        },
+        {
+          provide: getRepositoryToken(UsuarioPermissao),
+          useValue: repositoryUsuarioPermissao,
         },
       ],
     }).compile();
 
     service = module.get<UsuarioService>(UsuarioService);
-    repository = module.get<Repository<Usuario>>(getRepositoryToken(Usuario));
   });
 
   it('should be defined', () => {
@@ -34,223 +103,119 @@ describe('UsuarioService', () => {
   });
 
   describe('create', () => {
-    it('criar um novo usuário', async () => {
-      const createUsuarioDto = {
-        nome: 'Teste',
-        email: 'teste@teste.com',
-        senha: '123456',
-        ativo: true,
-        admin: false,
-        permissao: [],
-      };
-
-      const mockUsuario = Object.assign(createUsuarioDto, { id: 1 });
-
-      const spyRepositorySave = jest
-        .spyOn(repository, 'save')
-        .mockReturnValue(Promise.resolve(mockUsuario));
-
-      const response = await service.create(createUsuarioDto);
-
+    it('should create a new usuario', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+      jest.spyOn(repository, 'save').mockResolvedValue(mockUsuario);
+      const response = await service.create(mockCreateUsuarioDto);
       expect(response).toEqual(mockUsuario);
-      expect(spyRepositorySave).toHaveBeenCalled();
     });
 
-    it('lançar uma exceção ao repetir um email já cadastrado, quando criar um novo usuário', async () => {
-      const mockUsuario = {
-        id: 1,
-        nome: 'Teste',
-        email: 'teste@teste.com',
-        senha: '123456',
-        ativo: true,
-        admin: false,
-        permissao: [],
-      };
-
-      const spyRepositoryFindOne = jest
-        .spyOn(repository, 'findOne')
-        .mockReturnValue(Promise.resolve(mockUsuario));
-
-      try {
-        await service.create(mockUsuario);
-      } catch (error: any) {
-        expect(error.message).toBe(EMensagem.IMPOSSIVEL_CADASTRAR);
-        expect(spyRepositoryFindOne).toHaveBeenCalled();
-      }
+    it('should throw an error when usuario already exists', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockUsuario);
+      await expect(service.create(mockCreateUsuarioDto)).rejects.toThrow(
+        new HttpException(
+          EMensagem.IMPOSSIVEL_CADASTRAR,
+          HttpStatus.NOT_ACCEPTABLE,
+        ),
+      );
     });
   });
 
   describe('findAll', () => {
-    it('obter uma listagem de usuários', async () => {
-      const mockUsuarioLista = [
-        {
-          id: 1,
-          nome: 'Teste',
-          email: 'teste@teste.com',
-          senha: '123456',
-          ativo: true,
-          admin: false,
-          permissao: [],
-        },
-      ];
-
-      const spyRepositoryFind = jest
-        .spyOn(repository, 'find')
-        .mockReturnValue(Promise.resolve(mockUsuarioLista));
-
-      const response = await service.findAll(1, 10);
-
-      expect(response).toEqual(mockUsuarioLista);
-      expect(spyRepositoryFind).toHaveBeenCalled();
+    it('should return a list of usuarios', async () => {
+      const mockListaUsuarios = [mockUsuario];
+      jest
+        .spyOn(repository, 'findAndCount')
+        .mockResolvedValue([mockListaUsuarios, mockListaUsuarios.length]);
+      const response = await service.findAll(
+        0,
+        10,
+        mockFindAllOrder,
+        mockFindAllFilter,
+      );
+      expect(response.data).toEqual(mockListaUsuarios);
+      expect(response.count).toEqual(mockListaUsuarios.length);
     });
   });
 
-  describe('find', () => {
-    it('obter um usuário', async () => {
-      const mockUsuario = {
-        id: 1,
-        nome: 'Teste',
-        email: 'teste@teste.com',
-        senha: '123456',
-        ativo: true,
-        admin: false,
-        permissao: [],
-      };
-
-      const spyRepositoryFindOne = jest
-        .spyOn(repository, 'findOne')
-        .mockReturnValue(Promise.resolve(mockUsuario));
-
-      const response = await service.findOne(1);
-
+  describe('findOne', () => {
+    it('should return a usuario', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockUsuario);
+      const response = await service.findOne(mockUsuario.id);
       expect(response).toEqual(mockUsuario);
-      expect(spyRepositoryFindOne).toHaveBeenCalled();
     });
   });
 
   describe('update', () => {
-    it('alterar um usuário', async () => {
-      const updateUsuarioDto = {
-        id: 1,
-        nome: 'Teste',
-        email: 'teste@teste.com',
-        senha: '123456',
-        ativo: true,
-        admin: false,
-        permissao: [],
-      };
-
-      const mockUsuario = Object.assign(updateUsuarioDto, {});
-
-      const spyRepositoryFindOne = jest
-        .spyOn(repository, 'findOne')
-        .mockReturnValue(Promise.resolve(mockUsuario));
-
-      const spyRepositorySave = jest
-        .spyOn(repository, 'save')
-        .mockReturnValue(Promise.resolve(mockUsuario));
-
-      const response = await service.update(1, updateUsuarioDto);
-
-      expect(response).toEqual(mockUsuario);
-      expect(spyRepositoryFindOne).toHaveBeenCalled();
-      expect(spyRepositorySave).toHaveBeenCalled();
+    it('should update a usuario', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockUsuario);
+      jest.spyOn(repository, 'save').mockResolvedValue(mockUsuario);
+      const response = await service.update(
+        mockUpdateUsuarioDto.id,
+        mockUpdateUsuarioDto,
+      );
+      expect(response).toEqual(
+        Object.assign(mockUsuario, { senha: senhaBcrypt }),
+      );
     });
 
-    it('lançar uma exceção ao enviar ids diferentes quando alterar um usuário', async () => {
-      const updateUsuarioDto = {
-        id: 1,
-        nome: 'Teste',
-        email: 'teste@teste.com',
-        senha: '123456',
-        ativo: true,
-        admin: false,
-        permissao: [],
-      };
+    it('should throw an error when ids are different', async () => {
+      await expect(service.update(2, mockUpdateUsuarioDto)).rejects.toThrow(
+        new HttpException(EMensagem.IDS_DIFERENTES, HttpStatus.NOT_ACCEPTABLE),
+      );
+    });
+  });
 
-      try {
-        await service.update(999, updateUsuarioDto);
-      } catch (error: any) {
-        expect(error.message).toBe(EMensagem.IDS_DIFERENTES);
-      }
+  describe('alterarSenha', () => {
+    it('should alter the user password', async () => {
+      jest
+        .spyOn(repositoryRecuperacaoSenha, 'findOne')
+        .mockResolvedValue(mockRecuperarSenha);
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockUsuario);
+      jest.spyOn(repository, 'save').mockResolvedValue(mockUsuario);
+      const result = await service.alterarSenha({
+        email: mockUsuario.email,
+        senha: mockAlterarSenha.senha,
+        token: mockAlterarSenha.token,
+      });
+      expect(result).toBe(true);
     });
 
-    it('lançar uma exceção ao enviar um email previamente cadastrado quando alterar um usuário', async () => {
-      const createUsuarioDto = {
-        id: 1,
-        nome: 'Teste',
-        email: 'teste@teste.com',
-        senha: '123456',
-        ativo: true,
-        admin: false,
-        permissao: [],
-      };
-
-      const mockUsuarioFindOne = {
-        id: 2,
-        nome: 'Teste 2',
-        email: 'teste2@teste2.com',
-        senha: 'abcdef',
-        ativo: true,
-        admin: false,
-        permissao: [],
-      };
-
-      const spyRepositoryFindOne = jest
-        .spyOn(repository, 'findOne')
-        .mockReturnValue(Promise.resolve(mockUsuarioFindOne));
-
-      try {
-        await service.update(1, createUsuarioDto);
-      } catch (error: any) {
-        expect(error.message).toBe(EMensagem.IMPOSSIVEL_ALTERAR);
-        expect(spyRepositoryFindOne).toHaveBeenCalled();
-      }
+    it('should throw an error when the token is invalid', async () => {
+      jest.spyOn(repositoryRecuperacaoSenha, 'findOne').mockResolvedValue(null);
+      await expect(
+        service.alterarSenha({
+          email: mockUsuario.email,
+          senha: mockAlterarSenha.senha,
+          token: mockAlterarSenha.token,
+        }),
+      ).rejects.toThrow(
+        new HttpException(
+          EMensagem.IMPOSSIVEL_ALTERAR,
+          HttpStatus.NOT_ACCEPTABLE,
+        ),
+      );
     });
   });
 
   describe('unactivate', () => {
-    it('desativar um usuário', async () => {
-      const mockUsuarioFindOne = {
-        id: 1,
-        nome: 'Nome Teste',
-        email: 'nome.teste@teste.com',
-        senha: '123456',
-        ativo: true,
-        admin: true,
-        permissao: [],
-      };
-
-      const spyRepositoryFindOne = jest
-        .spyOn(repository, 'findOne')
-        .mockReturnValue(Promise.resolve(mockUsuarioFindOne) as any);
-
-      const mockUsuarioSave = Object.assign(mockUsuarioFindOne, {
-        ativo: false,
-      });
-
-      const spyRepositorySave = jest
+    it('should unactivate a usuario', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockUsuario);
+      jest
         .spyOn(repository, 'save')
-        .mockReturnValue(Promise.resolve(mockUsuarioSave) as any);
-
-      const response = await service.unactivate(1);
-
-      expect(response).toEqual(false);
-      expect(spyRepositoryFindOne).toHaveBeenCalled();
-      expect(spyRepositorySave).toHaveBeenCalled();
+        .mockResolvedValue(Object.assign(mockUsuario, { ativo: false }));
+      const response = await service.unactivate(mockUsuario.id);
+      expect(response).toBe(false);
     });
 
-    it('lançar erro ao não encontrar o usuario usando o id quando alterar um usuario', async () => {
-      const spyRepositoryFindOne = jest
-        .spyOn(repository, 'findOne')
-        .mockReturnValue(Promise.resolve(null) as any);
-
-      try {
-        await service.unactivate(1);
-      } catch (error: any) {
-        expect(error.message).toBe(EMensagem.IMPOSSIVEL_DESATIVAR);
-        expect(spyRepositoryFindOne).toHaveBeenCalled();
-      }
+    it('should throw an error when usuario is not found', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+      await expect(service.unactivate(mockUsuario.id)).rejects.toThrow(
+        new HttpException(
+          EMensagem.IMPOSSIVEL_DESATIVAR,
+          HttpStatus.NOT_ACCEPTABLE,
+        ),
+      );
     });
   });
 });

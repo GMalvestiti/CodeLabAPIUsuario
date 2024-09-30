@@ -6,7 +6,7 @@ import {
   IKongJWTConsumer,
   IKongJWTCredential,
 } from './interfaces/kong-consumer-jwt.interface';
-import { EMensagem } from 'src/shared/enums/mensagem.enum';
+import { EMensagem } from '../../shared/enums/mensagem.enum';
 
 @Injectable()
 export class KongService {
